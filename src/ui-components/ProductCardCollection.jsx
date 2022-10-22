@@ -6,28 +6,32 @@
 
 /* eslint-disable */
 import * as React from "react";
+import { SortDirection } from "@aws-amplify/datastore";
+import { Listing } from "../models";
 import {
-  createDataStorePredicate,
   getOverrideProps,
   useDataStoreBinding,
 } from "@aws-amplify/ui-react/internal";
-import { Listing } from "../models";
 import ProductCard from "./ProductCard";
 import { Collection } from "@aws-amplify/ui-react";
 export default function ProductCardCollection(props) {
   const { items: itemsProp, overrideItems, overrides, ...rest } = props;
-  const itemsFilterObj = { field: "price", operand: "0", operator: "gt" };
-  const itemsFilter = createDataStorePredicate(itemsFilterObj);
+  const itemsPagination = {
+    sort: (s) => s.createdAt(SortDirection.DESCENDING),
+  };
   const itemsDataStore = useDataStoreBinding({
     type: "collection",
     model: Listing,
-    criteria: itemsFilter,
+    pagination: itemsPagination,
   }).items;
   const items = itemsProp !== undefined ? itemsProp : itemsDataStore;
   return (
     <Collection
       type="list"
+      isSearchable={true}
+      isPaginated={true}
       searchPlaceholder="Search..."
+      itemsPerPage={6}
       direction="column"
       alignItems="stretch"
       justifyContent="left"

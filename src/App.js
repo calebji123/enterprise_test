@@ -14,6 +14,7 @@ import {
   Card,
   Badge,
   StepperField,
+  Divider,
 } from "@aws-amplify/ui-react";
 import { listListings } from "./graphql/queries";
 import {
@@ -21,6 +22,8 @@ import {
   deleteListing as deleteListingMutation,
 } from "./graphql/mutations";
 import { 
+  HeroLayout2,
+  Homepage1,
   Navigation,
   ProductCard,
   ProductCardCollection, 
@@ -83,7 +86,8 @@ const App = ({ signOut }) => {
   return (
     <View className="App">
       <Navigation />
-      <Heading level={1}>UofT marketplace</Heading>
+      <Homepage1 />
+      <Divider />
       <View as="form" margin="3rem 0" onSubmit={createListing}>
         <Flex direction="column" justifyContent="center" alignItems="center">
           <TextField
@@ -121,44 +125,9 @@ const App = ({ signOut }) => {
           </Button>
         </Flex>
       </View>
-      <Heading level={2}>Current Listings</Heading>
+      <Divider />
       <View margin="3rem 0" className="listing_view">
-      { listings.map((listing, key) => (
-        <Card variation="elevated" key={key}>
-          <Flex alignItems="flex-start" className="inside_view">
-            <Image src={listing.image}
-              alt="No image" width="8rem"/>
-            <Flex direction="column" gap="xs">
-              <Text fontSize="large" fontWeight="semibold">
-                {listing.name}
-              </Text>
-              <Text color="font.tertiary">
-                {listing.description}
-              </Text>
-              <Text
-                fontSize="large"
-                color="secondary">
-                $ {listing.price}
-              </Text>
-              <Flex>
-                <StepperField
-                  label="Quantity"
-                  min={0}
-                  max={10}
-                  step={1}
-                  defaultValue={0}
-                  labelHidden
-                />
-                <Button variation="primary">Add to cart</Button>
-              </Flex>
-            </Flex>
-          </Flex>
-        </Card>
-      )
-
-      )
-        
-      }
+      <ProductCardCollection />
       </View>
       {/* <Button onClick={signOut}>Sign Out</Button> */}
     </View>

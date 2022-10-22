@@ -32,6 +32,7 @@ export default function Homepage1(props) {
         objectFit="cover"
         position="relative"
         padding="0px 0px 0px 0px"
+        src="https://cdn.discordapp.com/attachments/930290285345406986/1033395102791503902/unknown.png"
         {...getOverrideProps(overrides, "image 1")}
       ></Image>
       <Flex

@@ -36,6 +36,7 @@ export default function ProductCard(props) {
         alignSelf="stretch"
         position="relative"
         padding="0px 0px 0px 0px"
+        src={listing?.image}
         {...getOverrideProps(overrides, "image")}
       ></Image>
       <Flex
@@ -205,7 +206,7 @@ export default function ProductCard(props) {
           position="relative"
           padding="0px 0px 0px 0px"
           whiteSpace="pre-wrap"
-          children="Information about this product."
+          children={listing?.description}
           {...getOverrideProps(overrides, "Information about this product.")}
         ></Text>
         <Flex
@@ -244,7 +245,7 @@ export default function ProductCard(props) {
             position="relative"
             padding="0px 0px 0px 0px"
             whiteSpace="pre-wrap"
-            children="“This is a quote.“"
+            children={`${"$"}${listing?.price}`}
             {...getOverrideProps(overrides, "\u201CThis is a quote.\u201C")}
           ></Text>
         </Flex>

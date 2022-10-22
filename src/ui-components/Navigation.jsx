@@ -35,6 +35,7 @@ export default function Navigation(props) {
         shrink="0"
         position="relative"
         padding="0px 0px 0px 0px"
+        src="https://cdn.discordapp.com/attachments/930290285345406986/1033395151390912512/utmp_pfp.png"
         {...getOverrideProps(overrides, "utmp pfp 1")}
       ></Image>
       <Text
@@ -189,6 +190,7 @@ export default function Navigation(props) {
           position="relative"
           borderRadius="160px"
           padding="0px 0px 0px 0px"
+          src="https://cdn.discordapp.com/attachments/930290285345406986/1033395151390912512/utmp_pfp.png"
           {...getOverrideProps(overrides, "image")}
         ></Image>
       </Flex>
