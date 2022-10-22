@@ -11,80 +11,101 @@ import {
   TextField,
   View,
   withAuthenticator,
+  Card,
+  Badge,
+  StepperField,
 } from "@aws-amplify/ui-react";
-import { listNotes } from "./graphql/queries";
+import { listListings } from "./graphql/queries";
 import {
-  createNote as createNoteMutation,
-  deleteNote as deleteNoteMutation,
+  createListing as createListingMutation,
+  deleteListing as deleteListingMutation,
 } from "./graphql/mutations";
+import { 
+  Navigation,
+  ProductCard,
+  ProductCardCollection, 
+  SocialPost
+} from './ui-components';
+
+
 
 const App = ({ signOut }) => {
-  const [notes, setNotes] = useState([]);
+  const [listings, setListings] = useState([]);
 
   useEffect(() => {
-    fetchNotes();
+    fetchListings();
   }, []);
 
-  async function fetchNotes() {
-    const apiData = await API.graphql({ query: listNotes });
-    const notesFromAPI = apiData.data.listNotes.items;
+  async function fetchListings() {
+    const apiData = await API.graphql({ query: listListings });
+    const listingsFromAPI = apiData.data.listListings.items;
     await Promise.all(
-      notesFromAPI.map(async (note) => {
-        if (note.image) {
-          const url = await Storage.get(note.name);
-          note.image = url;
+      listingsFromAPI.map(async (listing) => {
+        if (listing.image) {
+          const url = await Storage.get(listing.name);
+          listing.image = url;
         }
-        return note;
+        return listing;
       })
     );
-    setNotes(notesFromAPI);
+    setListings(listingsFromAPI);
   }
 
-  async function createNote(event) {
+  async function createListing(event) {
     event.preventDefault();
     const form = new FormData(event.target);
     const image = form.get("image");
     const data = {
       name: form.get("name"),
       description: form.get("description"),
+      price: form.get("price"),
       image: image.name,
     };
     if (!!data.image) await Storage.put(data.name, image);
     await API.graphql({
-      query: createNoteMutation,
+      query: createListingMutation,
       variables: { input: data },
     });
-    fetchNotes();
+    fetchListings();
     event.target.reset();
   }
 
-  async function deleteNote({ id, name }) {
-    const newNotes = notes.filter((note) => note.id !== id);
-    setNotes(newNotes);
+  async function deleteListing({ id, name }) {
+    const newListings = listings.filter((listing) => listing.id !== id);
+    setListings(newListings);
     await Storage.remove(name);
     await API.graphql({
-      query: deleteNoteMutation,
+      query: deleteListingMutation,
       variables: { input: { id } },
     });
   }
 
   return (
     <View className="App">
-      <Heading level={1}>My Notes App</Heading>
-      <View as="form" margin="3rem 0" onSubmit={createNote}>
-        <Flex direction="row" justifyContent="center">
+      <Navigation />
+      <Heading level={1}>UofT marketplace</Heading>
+      <View as="form" margin="3rem 0" onSubmit={createListing}>
+        <Flex direction="column" justifyContent="center" alignItems="center">
           <TextField
             name="name"
-            placeholder="Note Name"
-            label="Note Name"
+            placeholder="Listing Name"
+            label="Listing Name"
             labelHidden
             variation="quiet"
             required
           />
           <TextField
             name="description"
-            placeholder="Note Description"
-            label="Note Description"
+            placeholder="Listing Description"
+            label="Listing Description"
+            labelHidden
+            variation="quiet"
+            required
+          />
+          <TextField
+            name="price"
+            placeholder="Listing Price"
+            label="Listing Price"
             labelHidden
             variation="quiet"
             required
@@ -93,42 +114,79 @@ const App = ({ signOut }) => {
             name="image"
             as="input"
             type="file"
-            style={{ alignSelf: "end" }}
+            style={{ border:"solid black 1px" }}
           />
           <Button type="submit" variation="primary">
-            Create Note
+            Create Listing
           </Button>
         </Flex>
       </View>
-      <Heading level={2}>Current Notes</Heading>
-      <View margin="3rem 0">
-      {notes.map((note) => (
-        <Flex
-          key={note.id || note.name}
+      <Heading level={2}>Current Listings</Heading>
+      <View margin="3rem 0" className="listing_view">
+      { listings.map((listing, key) => (
+        <Card variation="elevated" key={key}>
+          <Flex alignItems="flex-start" className="inside_view">
+            <Image src={listing.image}
+              alt="No image" width="8rem"/>
+            <Flex direction="column" gap="xs">
+              <Text fontSize="large" fontWeight="semibold">
+                {listing.name}
+              </Text>
+              <Text color="font.tertiary">
+                {listing.description}
+              </Text>
+              <Text
+                fontSize="large"
+                color="secondary">
+                $ {listing.price}
+              </Text>
+              <Flex>
+                <StepperField
+                  label="Quantity"
+                  min={0}
+                  max={10}
+                  step={1}
+                  defaultValue={0}
+                  labelHidden
+                />
+                <Button variation="primary">Add to cart</Button>
+              </Flex>
+            </Flex>
+          </Flex>
+        </Card>
+      )
+
+      )
+        
+      }
+      </View>
+      {/* <Button onClick={signOut}>Sign Out</Button> */}
+    </View>
+  );
+};
+
+export default App;
+
+
+ {/* <Flex
+          key={listing.id || listing.name}
           direction="row"
           justifyContent="center"
           alignItems="center"
         >
           <Text as="strong" fontWeight={700}>
-            {note.name}
+            {listing.name}
           </Text>
-          <Text as="span">{note.description}</Text>
-          {note.image && (
+          <Text as="span">{listing.description}</Text>
+          {listing.image && (
             <Image
-              src={note.image}
-              alt={`visual aid for ${notes.name}`}
+              src={listing.image}
+              alt={`visual aid for ${listings.name}`}
               style={{ width: 400 }}
             />
           )}
-          <Button variation="link" onClick={() => deleteNote(note)}>
-            Delete note
+          <Text as="span">{listing.price}</Text>
+          <Button variation="link" onClick={() => deleteListing(listing)}>
+            Delete listing
           </Button>
-        </Flex>
-      ))}
-      </View>
-      <Button onClick={signOut}>Sign Out</Button>
-    </View>
-  );
-};
-
-export default withAuthenticator(App);
+        </Flex> */}

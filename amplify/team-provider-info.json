@@ -14,6 +14,9 @@
     "categories": {
       "auth": {
         "enterprisetest1105c549": {}
+      },
+      "storage": {
+        "imagestorage": {}
       }
     }
   }
